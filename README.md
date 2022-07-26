@@ -16,10 +16,19 @@ Follow these [Hubpost instruction](https://knowledge.hubspot.com/workflows/creat
 - In your HubSpot account, navigate to Automation > Workflows.
 - To create a new workflow, in the upper right, click **Create workflow**.
 - On the left, choose Start from scratch > **Contact-based**. On the right, choose **Blank workflow**, then click Next.
+
 ![](blank-workflow.png)
-- You can choose an optional trigger for the action by clicking the Set up triggers button and choosing form a list of triggers on the right. For our purposes, we will not set a trigger, so the action will have to be invoked manually. Click the **+ button** below the Contact enrollment trigger box.
+
+- Click on the **Contact enrollment trigger** box, then in the right sidebar click the **Re-enrollment** tab and click the two checkboxe shown below. You can also set an automatic trigger for the action in the Triggers tab but for our purposes we will not set a trigger and will invoke the action manually.
+
+![](re-enrollment.png) 
+
+- Click the **+ button** below the Contact enrollment trigger box.
+
 ![](trigger.png)
+
 - Click the **Custom code** button in the right sidebar.
+
 ![](custom-code.png)
 
 In the Custom code sidebar, enter the following:
@@ -28,16 +37,62 @@ In the Custom code sidebar, enter the following:
    - `AccountSID: <Your Twilio Account SID>`
    - `AuthToken: <Your Twilio Auth Token>`
    - `TwilioSenderID: <Your Twilio Phone Number in E.164 format (e.g. +12065551234)>`
- - For **Property to include in code** section, click Add propery, then search for and choose the following:
+ - For **Property to include in code** section, click Add property, then search for and choose the following:
    - First name: `firstname`
    - Phone number: `phone` (or Mobile phone if you prefer)
    - Mobile phone number: `mobilephone`
+
 ![](edit-action.png)
-- In the **Code** section, click the Full screen button to expand the code editor and paste the code from the `send-sms.js` file. Note: you may customize the `body` const with your desired message body text.
-![](code.png)
-- Click the Exit full screen button, to shrink the code editor, and enter the following **Data outputs**:
+
+- In the **Code** section, copy and paste the following code from the `send-sms.js` file. Note: you may customize the `body` const with your desired message body text.
+
+```js
+const axios = require("axios")
+exports.main = async (event, callback) => {
+  const accountSID = process.env.AccountSID
+  const authToken = process.env.AuthToken
+  const fromPhoneNumber = process.env.TwilioSenderID
+  const firstName = event.inputFields["firstname"]
+  const mobilePhone = event.inputFields["mobilephone"]
+  const phone = event.inputFields["phone"]
+  const toPhoneNumber = mobilePhone ? mobilePhone : phone
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSID}/Messages.json`
+  const body = `Hi ${firstName}. This is a Twilio SMS message sent from a Hubspot Automation Workflow.`
+  const params = new URLSearchParams()
+  params.append("From", fromPhoneNumber)
+  params.append("To", toPhoneNumber)
+  params.append("Body", body)
+  const config = {
+    headers: {
+      Authorization:
+        "Basic " + Buffer.from(`${accountSID}:${authToken}`).toString("base64"),
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  }
+  const response = await axios.post(url, params, config)
+  callback({
+    outputFields: {
+      MessageSid: response.data.sid,
+      MessageStatus: response.data.status,
+    },
+  })
+}
+```
+
+- In the **Data outputs** section, enter the following:
   - String: `MessageSid`
   - String: `MessageStatus`
+
 ![](data-ouputs.png)
+
 - Click the **Test action** link, search for your contact record, then click Test. If all goes well, you should see the `MessageSid` and `MessageStatus` displayed in the Data outputs section of the sidebar and you should receive a text message on your phone.
+
 ![](test.png)
+
+- Name the workflow "Send SMS Message" on the top center of the screen, then click **Save** on the bottom right. Then click the Review and Publish button on the top right.
+
+## Using the Worflow
+
+To invoke the workflow, go to the Contacts screen, check one or more contacts, click More > Enroll in worklow, select the "Send SMS Message" workflow and click Enroll. All of the checked contacts will receive the text message.
+![](enroll.png)
+
