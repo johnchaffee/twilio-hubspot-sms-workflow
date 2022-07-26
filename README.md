@@ -39,7 +39,7 @@ In the Custom code sidebar, enter the following:
    - `TwilioSenderID: <Your Twilio Phone Number in E.164 format (e.g. +12065551234)>`
  - For **Property to include in code** section, click Add property, then search for and choose the following:
    - First name: `firstname`
-   - Phone number: `phone` (or Mobile phone if you prefer)
+   - Phone number: `phone`
    - Mobile phone number: `mobilephone`
 
 ![](edit-action.png)
@@ -85,7 +85,7 @@ exports.main = async (event, callback) => {
 
 ![](data-ouputs.png)
 
-- Click the **Test action** link, search for your contact record, then click Test. If all goes well, you should see the `MessageSid` and `MessageStatus` displayed in the Data outputs section of the sidebar and you should receive a text message on your phone.
+- Click the **Test action** link, search for and select your contact record (create a contact record for yourself if you haven't already), then click Test. If all goes well, you should see the `MessageSid` and `MessageStatus` displayed in the Data outputs section of the sidebar and you should receive a text message on your phone.
 
 ![](test.png)
 
@@ -93,6 +93,6 @@ exports.main = async (event, callback) => {
 
 ## Using the Worflow
 
-To invoke the workflow, go to the Contacts screen, check one or more contacts, click More > Enroll in worklow, select the "Send SMS Message" workflow and click Enroll. All of the checked contacts will receive the text message.
+To invoke the workflow, go to the Contacts screen, check one or more contacts, click **More > Enroll in worklow**, select the **Send SMS Message** workflow and click **Enroll**. All of the checked contacts will receive the text message.
 ![](enroll.png)
 

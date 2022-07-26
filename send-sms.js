@@ -4,8 +4,9 @@ exports.main = async (event, callback) => {
   const authToken = process.env.AuthToken
   const fromPhoneNumber = process.env.TwilioSenderID
   const firstName = event.inputFields["firstname"]
-  const mobilePhone = event.inputFields["mobilephone"]
   const phone = event.inputFields["phone"]
+  const mobilePhone = event.inputFields["mobilephone"]
+  // Use mobilePhone as the toPhoneNumber if available, otherwise use phone
   const toPhoneNumber = mobilePhone ? mobilePhone : phone
   const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSID}/Messages.json`
   const body = `Hi ${firstName}. This is a Twilio SMS message sent from a Hubspot Automation Workflow.`
