@@ -95,4 +95,3 @@ exports.main = async (event, callback) => {
 
 To invoke the workflow, go to the Contacts screen, check one or more contacts, click **More > Enroll in worklow**, select the **Send SMS Message** workflow and click **Enroll**. All of the checked contacts will receive the text message.
 ![](enroll.png)
-
