@@ -3,6 +3,7 @@
 How to send an SMS from Hubspot using an Automation Worklow Custom Code Action.
 
 ## Overview
+
 This document describes the steps involved for sending SMS using Twilio Messaging API using Hubspot Workflow Custom Code Actions.
 
 Twilio APIs are easy to use and can be called from any platform capable of sending HTTP Requests. Hubspot enables customers to send HTTP requests using Custom Code Actions within Automation Workflows.
@@ -21,7 +22,7 @@ Follow these [Hubpost instruction](https://knowledge.hubspot.com/workflows/creat
 
 - Click on the **Contact enrollment trigger** box, then in the right sidebar click the **Re-enrollment** tab and click the two checkboxe shown below. You can also set an automatic trigger for the action in the Triggers tab but for our purposes we will not set a trigger and will invoke the action manually.
 
-![](images/re-enrollment.png) 
+![](images/re-enrollment.png)
 
 - Click the **+ button** below the Contact enrollment trigger box.
 
@@ -32,32 +33,52 @@ Follow these [Hubpost instruction](https://knowledge.hubspot.com/workflows/creat
 ![](images/custom-code.png)
 
 In the Custom code sidebar, enter the following:
- - For **Language**, select `Node.js 12.x`.
- - For **Secrets**, add secrets for the following (you can find these values in the Twilio Console):
-   - `AccountSID: <Your Twilio Account SID>`
-   - `AuthToken: <Your Twilio Auth Token>`
-   - `TwilioSenderID: <Your Twilio Phone Number in E.164 format (e.g. +12065551234)>`
- - For **Property to include in code** section, click Add property, then search for and choose the following:
-   - First name: `firstname`
-   - Phone number: `phone`
-   - Mobile phone number: `mobilephone`
+
+- For **Language**, select `Node.js 12.x`.
+- For **Secrets**, add secrets for the following (you can find these values in the Twilio Console):
+  - `AccountSID: <Your Twilio Account SID>`
+  - `AuthToken: <Your Twilio Auth Token>`
+  - `TwilioSenderID: <Your Twilio Phone Number in E.164 format (e.g. +12065551234)>`
+- For **Property to include in code** section, click Add property, then search for and choose the following:
+  - First name: `firstname`
+  - Phone number: `phone`
+  - Mobile phone number: `mobilephone`
 
 ![](images/edit-action.png)
 
 - In the **Code** section, copy and paste the following code from the `send-sms.js` file. Note: you may customize the `body` const with your desired message body text.
 
 ```js
+// Load the axios library for sending HTTP request to the Twilio API
 const axios = require("axios")
+
 exports.main = async (event, callback) => {
+  // Load environment variables that are stored as Secrets in Hubspot
+  // These are required for the Twilio API
   const accountSID = process.env.AccountSID
   const authToken = process.env.AuthToken
   const fromPhoneNumber = process.env.TwilioSenderID
-  const firstName = event.inputFields["firstname"]
-  const mobilePhone = event.inputFields["mobilephone"]
+
+  // Evaluate the contact's mobilePhone and phone fields to determine the toPhoneNumber
+  // Use the mobilePhone if it exists, otherwise use phone
+  // TODO: This would be a good place to use Lookup to verify the phone is a mobile number
   const phone = event.inputFields["phone"]
+  const mobilePhone = event.inputFields["mobilephone"]
   const toPhoneNumber = mobilePhone ? mobilePhone : phone
+
+  // Define the template for the message body. It can include dynamic {{variables}} from fields in Hubspot
+  // For each variable, make sure you add the corresponding property to the workflow during setup
+  const template =
+    "Hi {{firstname}}. This is a Twilio SMS message sent from a Hubspot Automation Workflow."
+
+  // Create message body by replacing the template {{variables}} with the input fields of the same key
+  const inputFields = event.inputFields
+  const body = template.replace(/{{([^}]+)}}/g, (match, key) => {
+    return inputFields[key]
+  })
+
+  // Define the axios url, params and config headers
   const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSID}/Messages.json`
-  const body = `Hi ${firstName}. This is a Twilio SMS message sent from a Hubspot Automation Workflow.`
   const params = new URLSearchParams()
   params.append("From", fromPhoneNumber)
   params.append("To", toPhoneNumber)
@@ -69,6 +90,8 @@ exports.main = async (event, callback) => {
       "Content-Type": "application/x-www-form-urlencoded",
     },
   }
+
+  // Send API request to Twilio via Axios
   const response = await axios.post(url, params, config)
   callback({
     outputFields: {
