@@ -17,19 +17,19 @@ Follow these [Hubpost instruction](https://knowledge.hubspot.com/workflows/creat
 - To create a new workflow, in the upper right, click **Create workflow**.
 - On the left, choose Start from scratch > **Contact-based**. On the right, choose **Blank workflow**, then click Next.
 
-![](blank-workflow.png)
+![](images/blank-workflow.png)
 
 - Click on the **Contact enrollment trigger** box, then in the right sidebar click the **Re-enrollment** tab and click the two checkboxe shown below. You can also set an automatic trigger for the action in the Triggers tab but for our purposes we will not set a trigger and will invoke the action manually.
 
-![](re-enrollment.png) 
+![](images/re-enrollment.png) 
 
 - Click the **+ button** below the Contact enrollment trigger box.
 
-![](trigger.png)
+![](images/trigger.png)
 
 - Click the **Custom code** button in the right sidebar.
 
-![](custom-code.png)
+![](images/custom-code.png)
 
 In the Custom code sidebar, enter the following:
  - For **Language**, select `Node.js 12.x`.
@@ -42,7 +42,7 @@ In the Custom code sidebar, enter the following:
    - Phone number: `phone`
    - Mobile phone number: `mobilephone`
 
-![](edit-action.png)
+![](images/edit-action.png)
 
 - In the **Code** section, copy and paste the following code from the `send-sms.js` file. Note: you may customize the `body` const with your desired message body text.
 
@@ -83,15 +83,15 @@ exports.main = async (event, callback) => {
   - String: `MessageSid`
   - String: `MessageStatus`
 
-![](data-ouputs.png)
+![](images/data-ouputs.png)
 
 - Click the **Test action** link, search for and select your contact record (create a contact record for yourself if you haven't already), then click Test. If all goes well, you should see the `MessageSid` and `MessageStatus` displayed in the Data outputs section of the sidebar and you should receive a text message on your phone.
 
-![](test.png)
+![](images/test.png)
 
 - Name the workflow "Send SMS Message" on the top center of the screen, then click **Save** on the bottom right. Then click the Review and Publish button on the top right.
 
 ## Using the Worflow
 
 To invoke the workflow, go to the Contacts screen, check one or more contacts, click **More > Enroll in worklow**, select the **Send SMS Message** workflow and click **Enroll**. All of the checked contacts will receive the text message.
-![](enroll.png)
+![](images/enroll.png)
