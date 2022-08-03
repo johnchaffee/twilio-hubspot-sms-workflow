@@ -46,7 +46,7 @@ In the Custom code sidebar, enter the following:
 
 ![](images/edit-action.png)
 
-- In the **Code** section, copy and paste the following code from the `send-sms.js` file. Note: you may customize the `body` const with your desired message body text.
+- In the **Code** section, copy and paste the following code from the `send-sms.js` file. Note: you may customize the `template` variable with your desired message body text.
 
 ```js
 // Load the axios library for sending HTTP request to the Twilio API
